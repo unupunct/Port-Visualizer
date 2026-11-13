@@ -1,0 +1,95 @@
+<UserControl x:Class="PortVisualizer.App.Views.LiveConnectionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="24,20,24,16">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <DockPanel Margin="0,0,0,12">
+            <TextBlock Text="Live Connections" Style="{StaticResource H1}"/>
+            <TextBlock Text="{Binding CountText}" Style="{StaticResource Muted}" Margin="16,0,0,0" VerticalAlignment="Bottom"/>
+        </DockPanel>
+
+        <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="300" Margin="0,0,10,6" Tag="Search process, PID, IP or port..." ToolTip="Search by process, PID, local/remote IP or port. Separate terms with spaces."/>
+            <ToggleButton Content="TCP" IsChecked="{Binding UseTcp}"/>
+            <ToggleButton Content="UDP" IsChecked="{Binding UseUdp}"/>
+            <ToggleButton Content="IPv4" IsChecked="{Binding UseIPv4}"/>
+            <ToggleButton Content="IPv6" IsChecked="{Binding UseIPv6}" Margin="0,0,10,0"/>
+            <ToggleButton Content="Established" IsChecked="{Binding EstablishedOnly}"/>
+            <ToggleButton Content="Listening" IsChecked="{Binding ListeningOnly}"/>
+            <ToggleButton Content="Show closed" IsChecked="{Binding ShowClosed}" Margin="0,0,10,0"/>
+            <ComboBox ItemsSource="{Binding States}" SelectedItem="{Binding SelectedState}" MinWidth="130"/>
+            <ComboBox ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset}" MinWidth="170" Tag="Filter presets" ToolTip="Filter presets (* = your saved presets)"/>
+            <Button Content="Save preset" Command="{Binding SavePresetCommand}"/>
+            <Button Content="Delete preset" Command="{Binding DeletePresetCommand}"/>
+            <Button Content="Reset filters" Command="{Binding ResetFiltersCommand}"/>
+            <Button x:Name="ColumnsButton" Content="Columns" Click="ColumnsButton_Click"/>
+            <Button x:Name="ExportButton" Content="Export" Click="ExportButton_Click"/>
+        </WrapPanel>
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+            <DataGrid x:Name="Grid" ItemsSource="{Binding Rows}" Margin="4" CanUserSortColumns="True" CanUserReorderColumns="True" PreviewMouseRightButtonDown="Grid_PreviewMouseRightButtonDown">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy IP address" Click="CopyIp_Click"/>
+                        <MenuItem Header="Copy local endpoint" Click="CopyLocal_Click"/>
+                        <MenuItem Header="Copy remote endpoint" Click="CopyRemote_Click"/>
+                        <MenuItem Header="Copy connection details" Click="CopyDetails_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Open process location" Click="OpenLocation_Click"/>
+                        <MenuItem Header="View process information" Click="ProcessInfo_Click"/>
+                        <Separator/>
+                        <MenuItem Header="Show connections of this process" Click="RelatedProcess_Click"/>
+                        <MenuItem Header="Show connections to this remote IP" Click="RelatedRemote_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn x:Name="ColStatus" Header="STATUS" Width="124" SortMemberPath="Status">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="{Binding Status, Converter={StaticResource StatusBrush}}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Status}" Margin="8,0,0,0" FontSize="11.5"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn x:Name="ColProcess" Header="PROCESS" Binding="{Binding ProcessName}" Width="170"/>
+                    <DataGridTextColumn x:Name="ColPID" Header="PID" Binding="{Binding Pid}" Width="80"/>
+                    <DataGridTextColumn x:Name="ColProtocol" Header="PROTO" Binding="{Binding Protocol}" Width="80"/>
+                    <DataGridTextColumn x:Name="ColLocalAddress" Header="LOCAL ADDRESS" Binding="{Binding LocalAddress}" Width="150"/>
+                    <DataGridTextColumn x:Name="ColLocalPort" Header="L.PORT" Binding="{Binding LocalPort}" Width="84"/>
+                    <DataGridTextColumn x:Name="ColRemoteAddress" Header="REMOTE ADDRESS" Binding="{Binding RemoteAddress}" Width="170"/>
+                    <DataGridTextColumn x:Name="ColRemotePort" Header="R.PORT" Binding="{Binding RemotePort}" Width="84"/>
+                    <DataGridTextColumn x:Name="ColState" Header="STATE" Binding="{Binding State}" Width="132"/>
+                    <DataGridTextColumn x:Name="ColFirstObserved" Header="FIRST SEEN" Binding="{Binding FirstObserved}" Width="104"/>
+                    <DataGridTextColumn x:Name="ColLastObserved" Header="LAST SEEN" Binding="{Binding LastObserved}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <TextBlock Grid.Row="3" Margin="2,8,0,0" Style="{StaticResource Muted}" FontSize="11.5"
+                   Text="UDP sockets are connectionless: Windows reports only the local endpoint, so remote address and state are intentionally blank."/>
+
+        <Popup x:Name="ColumnsPopup" PlacementTarget="{Binding ElementName=ColumnsButton}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+            <Border Style="{StaticResource Card}" Margin="0,4,0,10" Padding="14,10">
+                <Border.Effect><DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.4"/></Border.Effect>
+                <ItemsControl ItemsSource="{Binding Columns}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate><CheckBox Content="{Binding Header}" IsChecked="{Binding IsVisible}"/></DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </Popup>
+        <Popup x:Name="ExportPopup" PlacementTarget="{Binding ElementName=ExportButton}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+            <Border Style="{StaticResource Card}" Margin="0,4,0,10" Padding="6">
+                <Border.Effect><DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.4"/></Border.Effect>
+                <StackPanel>
+                    <Button Content="All connections..." Click="ExportAll_Click" HorizontalContentAlignment="Left" Margin="0,0,0,4" BorderThickness="0"/>
+                    <Button Content="Filtered connections..." Click="ExportFiltered_Click" Margin="0,0,0,4" BorderThickness="0"/>
+                    <Button Content="Selected connections..." Click="ExportSelected_Click" Margin="0,0,0,4" BorderThickness="0"/>
+                    <Button Content="Process connection summary..." Click="ExportSummary_Click" Margin="0" BorderThickness="0"/>
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

@@ -1,0 +1,35 @@
+<UserControl x:Class="PortVisualizer.App.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,20,24,24" MaxWidth="860" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                <Image Source="pack://application:,,,/Assets/logo.png" Width="96" Height="96"/>
+                <StackPanel Margin="20,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="Port Visualizer" FontSize="30" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Tagline}" FontSize="15" Foreground="{DynamicResource AccentBrush}"/>
+                    <TextBlock Text="{Binding Version}" Style="{StaticResource Muted}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </StackPanel>
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="WHAT IT DOES AND DOES NOT DO" Style="{StaticResource H2}"/>
+                    <TextBlock Text="{Binding Statement}" TextWrapping="Wrap" LineHeight="21"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="YOUR DATA" Style="{StaticResource H2}"/>
+                    <TextBlock TextWrapping="Wrap"><Run Text="Settings, history and logs are stored only on this computer in "/><Run Text="{Binding DataLocation, Mode=OneWay}" FontFamily="{StaticResource MonoFont}"/><Run Text=". Nothing is uploaded and no internet connection is needed."/></TextBlock>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="OPEN-SOURCE LICENSE" Style="{StaticResource H2}"/>
+                    <TextBox Text="{Binding License, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" BorderThickness="0" Background="Transparent" FontFamily="{StaticResource MonoFont}" FontSize="12" MaxHeight="260" VerticalScrollBarVisibility="Auto"/>
+                    <TextBlock Text="Built with .NET, WPF, CommunityToolkit.Mvvm, Microsoft.Data.Sqlite, Serilog and Microsoft.Extensions.DependencyInjection (all MIT/Apache-2.0)." Style="{StaticResource Muted}" FontSize="11.5" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,12 @@
+CHANGELOG
+
+1.0.0
+  - First release.
+  - Real-time TCP/UDP monitoring (IPv4 + IPv6) via IP Helper API, configurable interval, no overlapping cycles.
+  - Process identification by PID + start time; publisher/signature on demand; icons.
+  - Dashboard, Live Connections, interactive Network Map (4 layouts), Processes, Connection History, Alerts, Settings, About.
+  - Change detection with duplicate suppression; user-defined alert rules and whitelists.
+  - SQLite history with retention, backup, migrations.
+  - CSV/JSON/HTML export.
+  - System tray with active/paused badge, light/dark themes, accent colour.
+  - Single-file self-contained exe and Inno Setup installer.

@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="BgColor">#EEF1F4</Color>
+    <Color x:Key="PanelColor">#FFFFFF</Color>
+    <Color x:Key="PanelAltColor">#F6F8FA</Color>
+    <Color x:Key="BorderColor">#D3DAE1</Color>
+    <Color x:Key="TextColor">#1B2229</Color>
+    <Color x:Key="MutedColor">#5F6B77</Color>
+    <Color x:Key="HoverColor">#E6ECF1</Color>
+    <Color x:Key="SelectColor">#D3F3EA</Color>
+    <Color x:Key="Accent2Color">#0087B3</Color>
+    <Color x:Key="DangerColor">#D9640B</Color>
+    <SolidColorBrush x:Key="BgBrush" Color="{StaticResource BgColor}"/>
+    <SolidColorBrush x:Key="PanelBrush" Color="{StaticResource PanelColor}"/>
+    <SolidColorBrush x:Key="PanelAltBrush" Color="{StaticResource PanelAltColor}"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="{StaticResource MutedColor}"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="{StaticResource HoverColor}"/>
+    <SolidColorBrush x:Key="SelectBrush" Color="{StaticResource SelectColor}"/>
+    <SolidColorBrush x:Key="Accent2Brush" Color="{StaticResource Accent2Color}"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF"/>
+</ResourceDictionary>

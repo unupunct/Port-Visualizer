@@ -1,0 +1,74 @@
+<UserControl x:Class="PortVisualizer.App.Views.NetworkMapView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:PortVisualizer.App.Controls">
+    <Grid Margin="24,20,24,16">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="14"/><ColumnDefinition Width="320"/></Grid.ColumnDefinitions>
+
+        <DockPanel Grid.ColumnSpan="3" Margin="0,0,0,12">
+            <TextBlock Text="Network Map" Style="{StaticResource H1}"/>
+            <TextBlock Text="{Binding Summary}" Style="{StaticResource Muted}" Margin="16,0,0,0" VerticalAlignment="Bottom"/>
+        </DockPanel>
+
+        <WrapPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,10">
+            <ComboBox ItemsSource="{Binding Layouts}" SelectedItem="{Binding Layout}" MinWidth="160" ToolTip="Graph layout"/>
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="240" Margin="0,0,10,0" Tag="Filter by process, PID, IP or port..." ToolTip="Filter the graph"/>
+            <ToggleButton Content="TCP" IsChecked="{Binding UseTcp}"/>
+            <ToggleButton Content="UDP" IsChecked="{Binding UseUdp}"/>
+            <ToggleButton Content="IPv4" IsChecked="{Binding UseIPv4}"/>
+            <ToggleButton Content="IPv6" IsChecked="{Binding UseIPv6}" Margin="0,0,10,0"/>
+            <ToggleButton Content="Established only" IsChecked="{Binding EstablishedOnly}"/>
+            <ToggleButton Content="Listening / UDP" IsChecked="{Binding ShowListening}"/>
+            <ToggleButton Content="Closed" IsChecked="{Binding ShowClosed}"/>
+            <ToggleButton Content="Group remote by IP" IsChecked="{Binding GroupRemoteByIp}" Margin="0,0,10,0"/>
+            <Button Content="Reset layout" Command="{Binding ResetLayoutCommand}"/>
+            <Button Content="Fit to view" Click="Fit_Click"/>
+        </WrapPanel>
+
+        <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
+            <Grid>
+                <Grid.Background>
+                    <RadialGradientBrush Center="0.5,0.5" RadiusX="0.75" RadiusY="0.75">
+                        <GradientStop Color="#102020" Offset="0"/>
+                        <GradientStop Color="{DynamicResource PanelColor}" Offset="1"/>
+                    </RadialGradientBrush>
+                </Grid.Background>
+                <ctl:GraphCanvas x:Name="Canvas" Graph="{Binding Graph}" Animate="{Binding Animate}"/>
+                <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12" Padding="12,10" CornerRadius="8" Background="#CC0B0D10" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" IsHitTestVisible="False">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,3"><Ellipse Width="10" Height="10" Fill="#00E5A0"/><TextBlock Text="Local computer" Margin="8,0,16,0" Foreground="#C9D1D9" FontSize="11"/><Ellipse Width="10" Height="10" Fill="#00D4FF"/><TextBlock Text="Process" Margin="8,0,16,0" Foreground="#C9D1D9" FontSize="11"/><Ellipse Width="10" Height="10" Fill="#3B82F6"/><TextBlock Text="Remote endpoint" Margin="8,0,0,0" Foreground="#C9D1D9" FontSize="11"/></StackPanel>
+                        <StackPanel Orientation="Horizontal"><Ellipse Width="10" Height="10" Fill="#A855F7"/><TextBlock Text="Listening / UDP" Margin="8,0,16,0" Foreground="#C9D1D9" FontSize="11"/><Ellipse Width="10" Height="10" Fill="#FACC15"/><TextBlock Text="New" Margin="8,0,16,0" Foreground="#C9D1D9" FontSize="11"/><Ellipse Width="10" Height="10" Fill="#6B7280"/><TextBlock Text="Closed" Margin="8,0,16,0" Foreground="#C9D1D9" FontSize="11"/><Ellipse Width="10" Height="10" Fill="#FB923C"/><TextBlock Text="Alert rule match" Margin="8,0,0,0" Foreground="#C9D1D9" FontSize="11"/></StackPanel>
+                        <TextBlock Text="Wheel: zoom   Drag background: pan   Drag node: pin   Click: inspect   Line thickness = connection count" Foreground="#8793A0" FontSize="10.5" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="{Binding HiddenNote}" Foreground="#FB923C" FontSize="11.5" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12" Visibility="{Binding HiddenNote, Converter={StaticResource NullVis}}"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource Card}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="{Binding DetailsTitle}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                <WrapPanel DockPanel.Dock="Bottom" Margin="0,10,0,0" Visibility="{Binding HasSelection, Converter={StaticResource BoolVis}}">
+                    <Button Content="Copy details" Command="{Binding CopyDetailsCommand}"/>
+                    <Button Content="Open location" Command="{Binding OpenLocationCommand}"/>
+                    <Button Content="Resolve hostname" Command="{Binding ResolveHostCommand}" Visibility="{Binding CanResolve, Converter={StaticResource BoolVis}}"/>
+                </WrapPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Click a process, remote endpoint or listening port in the graph to inspect it." Style="{StaticResource Muted}" TextWrapping="Wrap"
+                           Visibility="{Binding HasSelection, Converter={StaticResource BoolVis}, ConverterParameter=invert}"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Details}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="{Binding Label}" Style="{StaticResource Muted}" FontSize="11"/>
+                                    <TextBlock Text="{Binding Value}" TextWrapping="Wrap" FontFamily="{StaticResource MonoFont}" FontSize="12"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>
